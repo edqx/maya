@@ -111,7 +111,7 @@ export async function recursiveGetRoutes(baseRoute: string): Promise<ProcessedRo
 
         if (fileStat.isDirectory()) {
             allRoutes.push(...await recursiveGetRoutes(path.join(baseRoute, fileName) + "/"));
-        } else {
+        } else if ((fileName.endsWith(".ts") || fileName.endsWith("js")) && !fileName.endsWith(".d.ts")) {
             const [ httpVerb, endpointName ] = path.basename(path.basename(fileName, ".ts"), ".js").split(" ");
 
             if (!httpVerb || !endpointName)

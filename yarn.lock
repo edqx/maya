@@ -146,13 +146,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@iarna/toml@npm:^2.2.5":
-  version: 2.2.5
-  resolution: "@iarna/toml@npm:2.2.5"
-  checksum: b63b2b2c4fd67969a6291543ada0303d45593801ee744b60f5390f183c03d9192bc67a217abb24be945158f1935f02840d9ffff40c0142aa171b5d3b6b6a3ea5
-  languageName: node
-  linkType: hard
-
 "@maya/api@workspace:api":
   version: 0.0.0-use.local
   resolution: "@maya/api@workspace:api"
@@ -196,7 +189,6 @@ __metadata:
     ts-node: ^10.4.0
     typescript: ^4.5.4
     utf-8-validate: ^5.0.7
-    zlib-sync: ^0.1.7
   languageName: unknown
   linkType: soft
 
@@ -217,7 +209,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@maya/web@workspace:web"
   dependencies:
-    "@sveltejs/adapter-auto": next
+    "@sveltejs/adapter-static": ^1.0.0-next.0
     "@sveltejs/kit": next
     "@typescript-eslint/eslint-plugin": ^4.31.1
     "@typescript-eslint/parser": ^4.31.1
@@ -314,42 +306,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/adapter-auto@npm:next":
-  version: 1.0.0-next.4
-  resolution: "@sveltejs/adapter-auto@npm:1.0.0-next.4"
-  dependencies:
-    "@sveltejs/adapter-cloudflare": 1.0.0-next.3
-    "@sveltejs/adapter-netlify": 1.0.0-next.36
-    "@sveltejs/adapter-vercel": 1.0.0-next.32
-  checksum: e4e934258b46635b3f77614c3efdcd84dc927e72d6c0ea4757780cf9508e62d390649177799bdc0116925edf9a755f418d6902e60b955cb3b76b7f241dc9b589
-  languageName: node
-  linkType: hard
-
-"@sveltejs/adapter-cloudflare@npm:1.0.0-next.3":
-  version: 1.0.0-next.3
-  resolution: "@sveltejs/adapter-cloudflare@npm:1.0.0-next.3"
-  dependencies:
-    esbuild: ^0.13.15
-  checksum: 317bb1ee10e0be6c05d201e7afdfa2714b64fedcd3a6b6015c7dbfe35d37136b6df44f6c3e4d460ed0ac7389d6cf7a0b436b43a3f004028df27dc45759e4e2bf
-  languageName: node
-  linkType: hard
-
-"@sveltejs/adapter-netlify@npm:1.0.0-next.36":
-  version: 1.0.0-next.36
-  resolution: "@sveltejs/adapter-netlify@npm:1.0.0-next.36"
-  dependencies:
-    "@iarna/toml": ^2.2.5
-    esbuild: ^0.13.15
-  checksum: 984db188e7367a7d5ef4866a9601e8465ab720fcdce51cf89ace992f6428b1c3cec74c2ee42962797c991eca716ec29834a9657685fba4cef5fc347746f6ae87
-  languageName: node
-  linkType: hard
-
-"@sveltejs/adapter-vercel@npm:1.0.0-next.32":
-  version: 1.0.0-next.32
-  resolution: "@sveltejs/adapter-vercel@npm:1.0.0-next.32"
-  dependencies:
-    esbuild: ^0.13.15
-  checksum: d3333ef173725eea50e38d3bb696e059d6e709b7f9127bf5a2890b29142f9efda707cb06cf70eec42080c8957143c71072676242e022daa8bb0b40d3b1496726
+"@sveltejs/adapter-static@npm:^1.0.0-next.0":
+  version: 1.0.0-next.22
+  resolution: "@sveltejs/adapter-static@npm:1.0.0-next.22"
+  checksum: 83dbdff3a3b19bcb030577a3296958ba3032ea6b1db9aecba722214e30706eb0e3acf4b95aae35f05704fa9ab706c5697c1adcc1ab82f1e00270f3ce9a49627f
   languageName: node
   linkType: hard
 
@@ -1644,7 +1604,7 @@ erlpack@discord/erlpack:
   languageName: node
   linkType: hard
 
-"esbuild@npm:^0.13.12, esbuild@npm:^0.13.15":
+"esbuild@npm:^0.13.12":
   version: 0.13.15
   resolution: "esbuild@npm:0.13.15"
   dependencies:
@@ -2897,7 +2857,7 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"nan@npm:^2.14.0, nan@npm:^2.15.0":
+"nan@npm:^2.15.0":
   version: 2.15.0
   resolution: "nan@npm:2.15.0"
   dependencies:
@@ -4251,15 +4211,5 @@ resolve@^1.20.0:
   version: 3.1.1
   resolution: "yn@npm:3.1.1"
   checksum: 2c487b0e149e746ef48cda9f8bad10fc83693cd69d7f9dcd8be4214e985de33a29c9e24f3c0d6bcf2288427040a8947406ab27f7af67ee9456e6b84854f02dd6
-  languageName: node
-  linkType: hard
-
-"zlib-sync@npm:^0.1.7":
-  version: 0.1.7
-  resolution: "zlib-sync@npm:0.1.7"
-  dependencies:
-    nan: ^2.14.0
-    node-gyp: latest
-  checksum: 8f6ef7bf5726b41fefffa4509f5679872b425ef47227a59d8c787b32518db6220961262f78b0f6eb1dcd9b52cd71bc8213d4f061b8b56a9b7e82c345a548e6f4
   languageName: node
   linkType: hard
