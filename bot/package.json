@@ -1,0 +1,31 @@
+{
+  "name": "@maya/bot",
+  "types": "./index.ts",
+  "typings": "./index.ts",
+  "main": "./dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "ts-node index.ts",
+    "build": "tsc -p ./",
+    "watch": "tsc -w -p ./"
+  },
+  "dependencies": {
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "@discordjs/voice": "^0.7.5",
+    "@maya/database": "workspace:*",
+    "bufferutil": "^4.0.5",
+    "discord-api-types": "^0.25.2",
+    "discord.js": "^13.3.1",
+    "dotenv": "^10.0.0",
+    "erlpack": "discord/erlpack",
+    "got": "11.8.3",
+    "postgres": "^2.0.0-beta.11",
+    "utf-8-validate": "^5.0.7",
+    "zlib-sync": "^0.1.7"
+  },
+  "devDependencies": {
+    "@types/got": "^9.6.12",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4"
+  }
+}

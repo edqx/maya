@@ -1,0 +1,1 @@
+<a href="{import.meta.env.VITE_API_BASE_URL}/auth/discord">login with discord</a>

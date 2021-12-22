@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist"
+  },
+  "files": [
+    "src/global.d.ts"
+  ],
+  "include": ["src", "bin", "@maya/database/src/Account.ts"]
+}

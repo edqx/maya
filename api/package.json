@@ -1,0 +1,34 @@
+{
+  "name": "@maya/api",
+  "types": "./index.ts",
+  "typings": "./index.ts",
+  "main": "./dist/index.js",
+  "scripts": {
+    "start": "node dist/bin/index.js",
+    "dev": "ts-node bin/index.ts",
+    "build": "tsc -p ./",
+    "watch": "tsc -w -p ./"
+  },
+  "dependencies": {
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "@maya/database": "workspace:*",
+    "chalk": "4.1.2",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "discord-api-types": "^0.25.2",
+    "dotenv": "^10.0.0",
+    "express-session": "^1.17.2",
+    "got": "11.8.3",
+    "postgres": "^2.0.0-beta.11",
+    "randomstring": "^1.2.1"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.2",
+    "@types/cors": "^2.8.12",
+    "@types/express-session": "^1.17.4",
+    "@types/got": "^9.6.12",
+    "@types/randomstring": "^1.1.8",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4"
+  }
+}
