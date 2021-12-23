@@ -51,7 +51,7 @@ app.post("/", async (req, res) => {
 
     const receivedSha256 = Buffer.from(receivedSha256Str, "hex");
 
-    if (crypto.timingSafeEqual(computedSha256, receivedSha256)) {
+    if (!crypto.timingSafeEqual(computedSha256, receivedSha256)) {
         console.log("Got deploy POST but the signature did not match:");
         console.log("    " + computedSha256.toString("hex"));
         console.log("    " + receivedSha256.toString("hex"));
