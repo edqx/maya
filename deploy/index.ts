@@ -91,10 +91,8 @@ app.post("/", async (req, res) => {
 
         console.log("Success!");
     } catch (e) {
-        console.log(e);
-
-        console.log("Got deploy POST but couldn't parse body:");
-        console.log("    " + req.body.toString("utf8"));
+        console.log("Got deploy POST but encountered an error");
+        console.log("   ", e);
     }
 });
 
