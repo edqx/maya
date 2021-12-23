@@ -84,8 +84,6 @@ app.post("/", async (req, res) => {
             await runCommandInDir("git reset --hard HEAD");
             console.log("Pulling remote changes..");
             await runCommandInDir("git pull");
-
-            throw new Error("testing");
     
             console.log(`"Building ${appsToBuild.map(app => `@maya/${app}`).join(",")} (${appsToBuild.length})..`);
             await Promise.all(appsToBuild.map((app, i) => {
@@ -94,6 +92,8 @@ app.post("/", async (req, res) => {
             }));
             
             console.log("Success!");
+            
+            throw new Error("testing");
     
             console.log("Restarting pm2 processes..");
             await runCommandInDir("pm2 restart all");
@@ -104,12 +104,12 @@ app.post("/", async (req, res) => {
             const embed = new discord.MessageEmbed()
                 .setTitle("🌹 Deployment Failed")
                 .setColor(0xed4245)
-                .setDescription(`Couldn't deploy latest commit [\`${json.after}\`](https://github.com/edqx/maya/commit/${json.after})`);
+                .setDescription(`Couldn't deploy latest commit [\`${json.after.substr(0, 7)}\`](https://github.com/edqx/maya/commit/${json.after})`);
 
             try {
                 embed
-                    .addField("Error", e.toString())
-                    .addField("Stack Trace", e.stack);
+                    .addField("Error", "`" + e.toString() + "`")
+                    .addField("Stack Trace", "```" + e.stack + "```");
             } catch (e) {
                 embed
                     .addField("Error", "Couldn't get error")
