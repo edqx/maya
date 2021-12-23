@@ -89,7 +89,7 @@ export async function recursiveGetRoutes(baseRoute: string): Promise<ProcessedRo
     inDirectory.sort(fileName => fileName.startsWith("404") ? 1 : -1);
     
     for (const fileName of inDirectory) {
-        if (fileName.startsWith("middleware")) {
+        if (fileName.startsWith("middleware") && !fileName.endsWith(".js.map") && !fileName.endsWith(".d.ts")) {
             const { default: middlewares } = await import(path.join(absolutePath, fileName));
 
             for (const middleware of middlewares) {
