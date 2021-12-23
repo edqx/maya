@@ -23,7 +23,7 @@ module.exports = {
         },
         {
             name: "web",
-            script: "build/index.js",
+            script: "index.js",
             cwd: "web/build",
             env: {
                 PORT: 8001
