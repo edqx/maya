@@ -92,8 +92,6 @@ app.post("/", async (req, res) => {
             }));
             
             console.log("Success!");
-            
-            throw new Error("testing");
     
             console.log("Restarting pm2 processes..");
             await runCommandInDir("pm2 restart all");
@@ -104,7 +102,7 @@ app.post("/", async (req, res) => {
             const embed = new discord.MessageEmbed()
                 .setTitle("🌹 Deployment Failed")
                 .setColor(0xed4245)
-                .setDescription(`Couldn't deploy latest commit [\`${json.after.substr(0, 7)}\`](https://github.com/edqx/maya/commit/${json.after})`);
+                .setDescription(`Couldn't deploy latest commit [\`${json.after.substr(0, 9)}\`](https://github.com/edqx/maya/commit/${json.after})`);
 
             try {
                 embed
@@ -116,7 +114,10 @@ app.post("/", async (req, res) => {
                     .addField("Error", "Couldn't get stack trace");
             }
 
-            webhookClient.send({ embeds: [ embed ] });
+            webhookClient.send({
+                content: "<@165358687974719488>",
+                embeds: [ embed ]
+            });
         }
     } catch (e) {
         console.log("Got deploy POST but encountered an error");
