@@ -111,19 +111,24 @@ export async function recursiveGetRoutes(baseRoute: string): Promise<ProcessedRo
 
         if (fileStat.isDirectory()) {
             allRoutes.push(...await recursiveGetRoutes(path.join(baseRoute, fileName) + "/"));
-        } else if ((fileName.endsWith(".ts") || fileName.endsWith("js")) && !fileName.endsWith(".d.ts")) {
+        } else if (!fileName.endsWith(".js.map") && !fileName.endsWith(".d.ts")) {
             const [ httpVerb, endpointName ] = path.basename(path.basename(fileName, ".ts"), ".js").split(" ");
 
             if (!httpVerb || !endpointName)
                 continue;
 
-            const { default: routeHandler } = await import(pathname);
-            
-            allRoutes.push({
-                verb: httpVerb,
-                route: normaliseEndpointName(baseRoute, endpointName).replace(/\$(.+?)\/?/g, ":$1").replace(/\\/g, "/"),
-                handler: routeHandler
-            });
+            try {
+                const { default: routeHandler } = await import(pathname);
+                
+                allRoutes.push({
+                    verb: httpVerb,
+                    route: normaliseEndpointName(baseRoute, endpointName).replace(/\$(.+?)\/?/g, ":$1").replace(/\\/g, "/"),
+                    handler: routeHandler
+                });
+            } catch (e) {
+                console.log("Failed to import %s:", pathname);
+                console.log(e);
+            }
         }
     }
 

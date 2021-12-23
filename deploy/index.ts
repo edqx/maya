@@ -30,6 +30,8 @@ app.use(express.raw({
     type: "*/*"
 }));
 
+const apps = [ "@maya/api", "@maya/database", "@maya/deploy", "@maya/web" ];
+
 app.post("/", async (req, res) => {
     if (!req.header("User-Agent")?.startsWith("GitHub-Hookshot/")) {
         console.log("Got deploy POST but the User-Agent did not match:");
@@ -88,10 +90,10 @@ app.post("/", async (req, res) => {
         console.log("Building @maya/web..");
         await runCommandInDir("yarn build", path.resolve(process.cwd(), "..", "web"));
         
+        console.log("Success!");
+
         console.log("Restarting pm2 processes..");
         await runCommandInDir("pm2 restart all");
-
-        console.log("Success!");
     } catch (e) {
         console.log("Got deploy POST but encountered an error");
         console.log("   ", e);
