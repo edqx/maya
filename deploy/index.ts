@@ -1,6 +1,7 @@
 import express from "express";
 import crypto from "crypto";
 import path from "path";
+import discord from "discord.js";
 import child_process from "child_process";
 
 import dotenv from "dotenv";
@@ -30,7 +31,9 @@ app.use(express.raw({
     type: "*/*"
 }));
 
-const apps = [ "@maya/api", "@maya/database", "@maya/deploy", "@maya/web" ];
+const appsToBuild = [ "@maya/api", "@maya/database", "@maya/deploy", "@maya/web" ];
+
+const webhookClient = new discord.WebhookClient({ id: process.env.DISCORD_WEBHOOK_ID as string, token: process.env.DISCORD_WEBHOOK_TOKEN as string });
 
 app.post("/", async (req, res) => {
     if (!req.header("User-Agent")?.startsWith("GitHub-Hookshot/")) {
@@ -63,8 +66,6 @@ app.post("/", async (req, res) => {
     try {
         const json = JSON.parse(req.body.toString("utf8"));
         
-        console.log("Got valid deploy POST, deploying..");
-
         console.log("Getting current commit..");
         const currentCommitUntrimmed = await runCommandInDir("git rev-parse HEAD");
         const currentCommit = currentCommitUntrimmed.trim();
@@ -76,24 +77,47 @@ app.post("/", async (req, res) => {
             return;
         }
 
-        console.log("Resetting any changes made locally..");
-        await runCommandInDir("git reset --hard HEAD");
-        console.log("Pulling remote changes..");
-        await runCommandInDir("git pull");
+        try {
+            console.log("Got valid deploy POST, deploying..");
+    
+            console.log("Resetting any changes made locally..");
+            await runCommandInDir("git reset --hard HEAD");
+            console.log("Pulling remote changes..");
+            await runCommandInDir("git pull");
 
-        console.log("Building @maya/api..");
-        await runCommandInDir("yarn build", path.resolve(process.cwd(), "..", "api"));
-        console.log("Building @maya/database..");
-        await runCommandInDir("yarn build", path.resolve(process.cwd(), "..", "database"));
-        console.log("Building @maya/deploy..");
-        await runCommandInDir("yarn build", path.resolve(process.cwd(), "..", "deploy"));
-        console.log("Building @maya/web..");
-        await runCommandInDir("yarn build", path.resolve(process.cwd(), "..", "web"));
-        
-        console.log("Success!");
+            throw new Error("testing");
+    
+            console.log(`"Building ${appsToBuild.map(app => `@maya/${app}`).join(",")} (${appsToBuild.length})..`);
+            await Promise.all(appsToBuild.map((app, i) => {
+                return runCommandInDir("yarn build", path.resolve(process.cwd(), "..", app))
+                    .then(() => console.log(`(${i + 1}) Built @maya/${app}!`));
+            }));
+            
+            console.log("Success!");
+    
+            console.log("Restarting pm2 processes..");
+            await runCommandInDir("pm2 restart all");
+        } catch (e: any) {
+            console.log("Got deploy POST but encountered an error");
+            console.log("   ", e);
 
-        console.log("Restarting pm2 processes..");
-        await runCommandInDir("pm2 restart all");
+            const embed = new discord.MessageEmbed()
+                .setTitle("🌹 Deployment Failed")
+                .setColor(0xed4245)
+                .setDescription(`Couldn't deploy latest commit [\`${json.after}\`](https://github.com/edqx/maya/commit/${json.after})`);
+
+            try {
+                embed
+                    .addField("Error", e.toString())
+                    .addField("Stack Trace", e.stack);
+            } catch (e) {
+                embed
+                    .addField("Error", "Couldn't get error")
+                    .addField("Error", "Couldn't get stack trace");
+            }
+
+            webhookClient.send({ embeds: [ embed ] });
+        }
     } catch (e) {
         console.log("Got deploy POST but encountered an error");
         console.log("   ", e);
