@@ -41,7 +41,7 @@
             {#if connection[1]}
                 <a href="https://lichess.com/@/{connection[1]}">{connection[1]}</a> (<span class="fake-link" on:click={() => unlinkConnection(connection[0])}>unlink</span>)
             {:else}
-                <a href="{import.meta.env.VITE_API_BASE_URL}/auth/{connection[0]}">connect</a>
+                <a rel="external" href="{import.meta.env.VITE_API_BASE_URL}/auth/{connection[0]}">connect</a>
             {/if}
         {/if}
     {/each}
