@@ -4,11 +4,12 @@ import preprocess from "svelte-preprocess";
 const config = {
 	preprocess: preprocess(),
 	kit: {
-		adapter: adapter(),
-		target: "#svelte",
-		env: {
-			PORT: "8001"
-		}
+		adapter: adapter({
+			env: {
+				PORT: "8001"
+			}
+		}),
+		target: "#svelte"
 	}
 };
 
