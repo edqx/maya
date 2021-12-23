@@ -32,5 +32,5 @@
     <span>Logged in as: {user} (<span class="fake-link" on:click={() => logout()}>logout</span>)</span><br>
     <slot></slot>
 {:else}
-    Not logged in, <a href="{import.meta.env.VITE_API_BASE_URL}/auth/discord">login with discord</a>
+    Not logged in, <a rel="external" href="{import.meta.env.VITE_API_BASE_URL}/auth/discord">login with discord</a>
 {/if}
