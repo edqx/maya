@@ -31,7 +31,7 @@ app.use(express.raw({
     type: "*/*"
 }));
 
-const appsToBuild = [ "@maya/api", "@maya/database", "@maya/deploy", "@maya/web" ];
+const appsToBuild = [ "api", "database", "deploy", "web" ];
 
 const webhookClient = new discord.WebhookClient({ id: process.env.DISCORD_WEBHOOK_ID as string, token: process.env.DISCORD_WEBHOOK_TOKEN as string });
 
