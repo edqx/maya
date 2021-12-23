@@ -31,7 +31,7 @@ app.use(express.raw({
     type: "*/*"
 }));
 
-const appsToBuild = [ "api", "database", "deploy", "web" ];
+const workspacesToBuild = [ "api", "database", "deploy", "web" ];
 
 const webhookClient = new discord.WebhookClient({ id: process.env.DISCORD_WEBHOOK_ID as string, token: process.env.DISCORD_WEBHOOK_TOKEN as string });
 
@@ -84,17 +84,32 @@ app.post("/", async (req, res) => {
             await runCommandInDir("git reset --hard HEAD");
             console.log("Pulling remote changes..");
             await runCommandInDir("git pull");
+            console.log("Installing new dependencies..");
+            await runCommandInDir("yarn");
     
-            console.log(`Building ${appsToBuild.map(app => `@maya/${app}`).join(", ")} (${appsToBuild.length})..`);
-            await Promise.all(appsToBuild.map((app, i) => {
-                return runCommandInDir("yarn build", path.resolve(process.cwd(), "..", app))
-                    .then(() => console.log(`(${i + 1}) Built @maya/${app}!`));
+            const failedToBuild: [ string, Error ][] = [];
+            console.log(`Building ${workspacesToBuild.map(workspace => `@maya/${workspace}`).join(", ")} (${workspacesToBuild.length})..`);
+            await Promise.all(workspacesToBuild.map((workspace, i) => {
+                return runCommandInDir("yarn build", path.resolve(process.cwd(), "..", workspace))
+                    .then(() => console.log(`(${i + 1}) Built @maya/${workspace}!`))
+                    .catch(e => failedToBuild.push([ workspace, e ]));
             }));
             
             console.log("Success!");
     
             console.log("Restarting pm2 processes..");
             await runCommandInDir("pm2 restart all");
+
+            if (failedToBuild.length) {
+                const embed = new discord.MessageEmbed()
+                    .setTitle("🚧 Builds Failed")
+                    .setColor(0xed4245)
+                    .setDescription(`Failed to build some workspaces:`);
+
+                for (const [ workspace, error ] of failedToBuild) {
+                    embed.addField(workspace, "```" + error.toString().substr(0, 1020) + "```");
+                }
+            }
         } catch (e: any) {
             console.log("Got deploy POST but encountered an error");
             console.log("   ", e);
@@ -102,12 +117,12 @@ app.post("/", async (req, res) => {
             const embed = new discord.MessageEmbed()
                 .setTitle("🌹 Deployment Failed")
                 .setColor(0xed4245)
-                .setDescription(`Couldn't deploy latest commit [\`${json.after.substr(0, 9)}\`](https://github.com/edqx/maya/commit/${json.after})`);
+                .setDescription(`Encountered an error whilst deploying latest commit: [\`${json.after.substr(0, 9)}\`](https://github.com/edqx/maya/commit/${json.after})`);
 
             try {
                 embed
                     .addField("Error", "`" + e.toString() + "`")
-                    .addField("Stack Trace", "```" + e.stack + "```");
+                    .addField("Stack Trace", "```" + e.stack?.substr(0, 1020) + "```");
             } catch (e) {
                 embed
                     .addField("Error", "Couldn't get error")
