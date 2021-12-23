@@ -85,7 +85,7 @@ app.post("/", async (req, res) => {
             console.log("Pulling remote changes..");
             await runCommandInDir("git pull");
     
-            console.log(`"Building ${appsToBuild.map(app => `@maya/${app}`).join(",")} (${appsToBuild.length})..`);
+            console.log(`Building ${appsToBuild.map(app => `@maya/${app}`).join(", ")} (${appsToBuild.length})..`);
             await Promise.all(appsToBuild.map((app, i) => {
                 return runCommandInDir("yarn build", path.resolve(process.cwd(), "..", app))
                     .then(() => console.log(`(${i + 1}) Built @maya/${app}!`));
