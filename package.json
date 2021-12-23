@@ -8,6 +8,7 @@
     "api",
     "bot",
     "database",
+    "deploy",
     "web"
   ],
   "devDependencies": {

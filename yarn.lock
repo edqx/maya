@@ -209,7 +209,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@maya/web@workspace:web"
   dependencies:
-    "@sveltejs/adapter-static": ^1.0.0-next.0
+    "@sveltejs/adapter-node": ^1.0.0-next.0
     "@sveltejs/kit": next
     "@typescript-eslint/eslint-plugin": ^4.31.1
     "@typescript-eslint/parser": ^4.31.1
@@ -306,10 +306,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/adapter-static@npm:^1.0.0-next.0":
-  version: 1.0.0-next.22
-  resolution: "@sveltejs/adapter-static@npm:1.0.0-next.22"
-  checksum: 83dbdff3a3b19bcb030577a3296958ba3032ea6b1db9aecba722214e30706eb0e3acf4b95aae35f05704fa9ab706c5697c1adcc1ab82f1e00270f3ce9a49627f
+"@sveltejs/adapter-node@npm:^1.0.0-next.0":
+  version: 1.0.0-next.56
+  resolution: "@sveltejs/adapter-node@npm:1.0.0-next.56"
+  dependencies:
+    esbuild: ^0.13.15
+    tiny-glob: ^0.2.9
+  checksum: fe70b580091779fbd0dcc62a808b8501b706c7f86155075002cce8ff56a682653235d0e7f3032d1dc9e31eb342a80e851cabbfcf5999e703bcd374f661455ad4
   languageName: node
   linkType: hard
 
@@ -1604,7 +1607,7 @@ erlpack@discord/erlpack:
   languageName: node
   linkType: hard
 
-"esbuild@npm:^0.13.12":
+"esbuild@npm:^0.13.12, esbuild@npm:^0.13.15":
   version: 0.13.15
   resolution: "esbuild@npm:0.13.15"
   dependencies:
@@ -2170,6 +2173,13 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
+"globalyzer@npm:0.1.0":
+  version: 0.1.0
+  resolution: "globalyzer@npm:0.1.0"
+  checksum: 419a0f95ba542534fac0842964d31b3dc2936a479b2b1a8a62bad7e8b61054faa9b0a06ad9f2e12593396b9b2621cac93358d9b3071d33723fb1778608d358a1
+  languageName: node
+  linkType: hard
+
 "globby@npm:^11.0.3":
   version: 11.0.4
   resolution: "globby@npm:11.0.4"
@@ -2181,6 +2191,13 @@ fsevents@~2.3.2:
     merge2: ^1.3.0
     slash: ^3.0.0
   checksum: d3e02d5e459e02ffa578b45f040381c33e3c0538ed99b958f0809230c423337999867d7b0dbf752ce93c46157d3bbf154d3fff988a93ccaeb627df8e1841775b
+  languageName: node
+  linkType: hard
+
+"globrex@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "globrex@npm:0.1.2"
+  checksum: adca162494a176ce9ecf4dd232f7b802956bb1966b37f60c15e49d2e7d961b66c60826366dc2649093cad5a0d69970cfa8875bd1695b5a1a2f33dcd2aa88da3c
   languageName: node
   linkType: hard
 
@@ -3856,6 +3873,16 @@ resolve@^1.20.0:
   version: 0.2.0
   resolution: "text-table@npm:0.2.0"
   checksum: b6937a38c80c7f84d9c11dd75e49d5c44f71d95e810a3250bd1f1797fc7117c57698204adf676b71497acc205d769d65c16ae8fa10afad832ae1322630aef10a
+  languageName: node
+  linkType: hard
+
+"tiny-glob@npm:^0.2.9":
+  version: 0.2.9
+  resolution: "tiny-glob@npm:0.2.9"
+  dependencies:
+    globalyzer: 0.1.0
+    globrex: ^0.1.2
+  checksum: aea5801eb6663ddf77ebb74900b8f8bd9dfcfc9b6a1cc8018cb7421590c00bf446109ff45e4b64a98e6c95ddb1255a337a5d488fb6311930e2a95334151ec9c6
   languageName: node
   linkType: hard
 
