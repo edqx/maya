@@ -124,4 +124,7 @@ app.post("/", async (req, res) => {
     }
 });
 
-app.listen(parseInt(process.env.PORT as string) || 8002);
+const port = parseInt(process.env.PORT as string) || 8002;
+app.listen(port, () => {
+    console.log("Listening on *:" + port);
+});
