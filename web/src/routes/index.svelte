@@ -144,7 +144,7 @@ import Fail from "./fail.svelte";
                                 </button>
                             {:else}
                                 <a rel="external" href="{import.meta.env.VITE_API_BASE_URL}/auth/{connection.id}">
-                                    <button style="width: 65px;" on:click={() => unlinkConnection(connection.id)}>
+                                    <button style="width: 65px;">
                                         {#if connectionLoading.has(connection.id)}
                                             <TailSpinLoader width={16}></TailSpinLoader>
                                         {:else}
