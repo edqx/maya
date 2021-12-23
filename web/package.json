@@ -11,6 +11,7 @@
     "lint": "eslint --ignore-path .gitignore ."
   },
   "devDependencies": {
+    "@poppanator/sveltekit-svg": "^0.2.2",
     "@sveltejs/kit": "next",
     "@typescript-eslint/eslint-plugin": "^4.31.1",
     "@typescript-eslint/parser": "^4.31.1",
@@ -22,6 +23,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@netulip/rollup-plugin-svg": "^0.0.3",
     "@sveltejs/adapter-node": "^1.0.0-next.0"
   }
 }

@@ -6,7 +6,6 @@ import chalk from "chalk";
 import got from "got";
 
 import passport from "passport";
-import postgres from "postgres";
 
 import sessions from "express-session";
 

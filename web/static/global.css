@@ -1,9 +1,38 @@
-a {
-    color: blue;
+@import url("https://fonts.googleapis.com/css2?family=Questrial&display=swap");
+
+html, body, #svelte {
+    padding: 0;
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #141414;
+    color: #eeeeee;
+    font-family: "Questrial", sans-serif;
 }
 
-.fake-link {
+a {
+    text-decoration: none;
     cursor: pointer;
-    color: blue;
-    text-decoration: underline;
+}
+
+button {
+    border: none;
+    outline: none;
+    padding: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 4px;
+    background-color: #222222;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button:hover {
+    background-color: #181818;
+}
+
+.error {
+    color: #ed4245;
 }

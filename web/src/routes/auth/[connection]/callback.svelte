@@ -5,11 +5,19 @@
 
     onMount(async () => {
         const exchangeCode = $page.query.get("code");
+        const connection = $page.params.connection;
+        const state = $page.query.get("state")
 
-        if (!exchangeCode)
-            return goto("/fail");
+        if (!exchangeCode) {
+            localStorage.setItem("fail", JSON.stringify({
+                connectionId: connection,
+                status: undefined,
+                message: undefined
+            }));
+            return goto("/");
+        }
 
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/${$page.params.connection}/authorize?state=${$page.query.get("state")}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/${connection}/authorize?state=${state}`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -21,9 +29,25 @@
         });
 
         if (res.ok) {
-            goto("/account/connections");
+            goto("/");
         } else {
-            goto("/fail");
+            try {
+                const json = await res.json();
+
+                localStorage.setItem("fail", JSON.stringify({
+                    connectionId: connection,
+                    status: res.status,
+                    message: json.message
+                }));
+                goto("/");
+            } catch (e) {
+                localStorage.setItem("fail", JSON.stringify({
+                    connectionId: connection,
+                    status: res.status,
+                    message: undefined
+                }));
+                goto("/");
+            }
         }
     });
 </script>

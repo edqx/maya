@@ -87,7 +87,9 @@ export class MayaDatabaseConnection {
         });
     }
 
-    async getSessions(userId: string): Promise<SessionId[]> {
+    async getSessions(user: string|Account): Promise<SessionId[]> {
+        const userId = typeof user === "string" ? user : user.user_id;
+
         const cachedSessions = this.cache.getCached<SessionId[]>(`sessions.${userId}`);
         if (cachedSessions)
             return cachedSessions;
@@ -127,7 +129,8 @@ export class MayaDatabaseConnection {
         return sessionRow as SessionId;
     }
 
-    async getSessionByIp(userId: string, ipAddress: string): Promise<SessionId|undefined> {
+    async getSessionByIp(user: string|Account, ipAddress: string): Promise<SessionId|undefined> {
+        const userId = typeof user === "string" ? user : user.user_id;
         const cachedSession = this.cache.getCached<SessionId>(`session.${userId}.${ipAddress}`);
         if (cachedSession)
             return cachedSession === null ? undefined : cachedSession;
@@ -149,7 +152,8 @@ export class MayaDatabaseConnection {
         return sessionRow as SessionId;
     }
 
-    async getOrCreateSession(userId: string, ipAddress: string): Promise<SessionId> {
+    async getOrCreateSession(user: string|Account, ipAddress: string): Promise<SessionId> {
+        const userId = typeof user === "string" ? user : user.user_id;
         const existingSession = await this.getSessionByIp(userId, ipAddress);
 
         if (existingSession)
@@ -366,5 +370,43 @@ export class MayaDatabaseConnection {
         // check against each connection name/type
 
         return accountConnection.access_token;
+    }
+
+    async deleteAllInformation(user: string|Account) {
+        const userId = typeof user === "string" ? user : user.user_id;
+
+        const connections = await this.getAccountConnections(user);
+        const sessions = await this.getSessions(user);
+
+        await this.postgresConnection`
+            DELETE
+            FROM accounts
+            WHERE user_id = ${userId}
+        `;
+        
+        await this.postgresConnection`
+            DELETE
+            FROM account_connections
+            WHERE discord_user_id = ${userId}
+        `;
+        
+        await this.postgresConnection`
+            DELETE
+            FROM session_ids
+            WHERE discord_user_id = ${userId}
+        `;
+
+        await this.cache.invalidateCached(`connections.${userId}`);
+        await this.cache.invalidateCached(`account.${userId}`);
+        await this.cache.invalidateCached(`sessions.${userId}`);
+
+        for (const connection of connections) {
+            await this.cache.invalidateCached(`connection.${userId}.${connection.connection_name}`);
+        }
+        
+        for (const session of sessions) {
+            await this.cache.invalidateCached(`session.${session.id}`);
+            await this.cache.invalidateCached(`session.${session.discord_user_id}.${session.ip_address}`);
+        }
     }
 }

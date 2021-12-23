@@ -18,6 +18,9 @@ export default async function (server: MayaApiServer, req: express.Request, res:
                 return reject(new ApiError(StatusCode.InternalServerError, "LichessFailedToAuthorize", "Failed to get OAuth2 access token."));
 
             const { accessToken, user } = result;
+            
+            if (!accessToken)
+                return reject(new ApiError(StatusCode.InternalServerError, "LichessFailedToFetchUser", "Failed to get OAuth2 access token."));
 
             if (!user)
                 return reject(new ApiError(StatusCode.InternalServerError, "LichessFailedToFetchUser", "Failed to fetch user after successfully getting OAuth2 access token."));
