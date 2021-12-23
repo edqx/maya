@@ -85,7 +85,9 @@ app.post("/", async (req, res) => {
             console.log("Pulling remote changes..");
             await runCommandInDir("git pull");
             console.log("Installing new dependencies..");
-            await runCommandInDir("yarn");
+            try {
+                await runCommandInDir("yarn");
+            } catch (e) {}
     
             const failedToBuild: [ string, Error ][] = [];
             console.log(`Building ${workspacesToBuild.map(workspace => `@maya/${workspace}`).join(", ")} (${workspacesToBuild.length})..`);

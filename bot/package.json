@@ -17,7 +17,6 @@
     "discord-api-types": "^0.25.2",
     "discord.js": "^13.3.1",
     "dotenv": "^10.0.0",
-    "erlpack": "discord/erlpack",
     "got": "11.8.3",
     "postgres": "^2.0.0-beta.11",
     "utf-8-validate": "^5.0.7"
