@@ -4,7 +4,9 @@ import path from "path";
 import child_process from "child_process";
 
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config({
+    path: path.resolve(process.cwd(), "../.env")
+});
 
 function runCommandInDir(command: string, dir?: string) {
     return new Promise<string>((resolve, reject) => {
@@ -96,4 +98,4 @@ app.post("/", async (req, res) => {
     }
 });
 
-app.listen(8002);
+app.listen(parseInt(process.env.PORT as string) || 8002);

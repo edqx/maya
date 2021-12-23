@@ -19,7 +19,7 @@ export default async function (server: MayaApiServer, req: express.Request, res:
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: `client_id=${process.env.CLIENT_ID as string}&client_secret=${process.env.CLIENT_SECRET as string}&grant_type=authorization_code&code=${req.body.code}&redirect_uri=${encodeURIComponent(process.env.AUTH_CALLBACK_URL as string + "/auth/discord/callback")}`
+            body: `client_id=${process.env.CLIENT_ID as string}&client_secret=${process.env.CLIENT_SECRET as string}&grant_type=authorization_code&code=${req.body.code}&redirect_uri=${encodeURIComponent(process.env.BASE_WEB as string + "/auth/discord/callback")}`
         }).json();
             
         try {

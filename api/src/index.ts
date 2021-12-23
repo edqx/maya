@@ -51,7 +51,7 @@ passport.deserializeUser((obj, cb) => cb(undefined, obj as false|Express.User));
 passport.use(
     new LichessStrategy({
         clientID: "maya",
-        callbackURL: process.env.AUTH_CALLBACK_URL + "/auth/lichess/callback"
+        callbackURL: process.env.BASE_WEB + "/auth/lichess/callback"
     },
     async (accessToken: string, refreshToken: string, profile: any, cb: (err: any, user: any) => void) => {
         try {

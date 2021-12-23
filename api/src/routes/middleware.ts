@@ -6,7 +6,7 @@ import { useMiddleware } from "../util/useMiddleware";
 
 export default [
     useMiddleware(cors({
-        origin: process.env.AUTH_CALLBACK_URL,
+        origin: process.env.BASE_WEB,
         credentials: true
     })),
     useMiddleware(express.json()),

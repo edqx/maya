@@ -202,7 +202,7 @@ const commands: dtypes.RESTPutAPIApplicationCommandsJSONBody = [
     }
 ];
 
-const rest = new REST({ version: "9" }).setToken(process.env.DISCORD_TOKEN as string);
+const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN as string);
 
 const stoicAuthorImages: Record<string, string> = {
     "Epictetus": "https://i.imgur.com/OmHdT8N.png",
@@ -314,7 +314,7 @@ setInterval(() => {
 
     console.log("Logging in..");
 
-    await client.login(process.env.DISCORD_TOKEN as string);
+    await client.login(process.env.BOT_TOKEN as string);
 
     console.log("Logged in!");
 

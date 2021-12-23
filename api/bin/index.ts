@@ -1,31 +1,9 @@
 import dotenv from "dotenv";
 import path from "path";
-import fs from "fs";
 
-const dotEnvLocation = path.resolve(process.cwd(), ".env");
-
-try {
-    fs.statSync(dotEnvLocation);
-} catch (e) {
-    try {
-        fs.writeFileSync(dotEnvLocation, `
-POSTGRES_HOST=127.0.0.1
-POSTGRES_PORT=5379
-POSTGRES_USER=admin
-POSTGRES_PASSWORD=1234
-POSTGRES_DB=postgres
-
-BASE_URL=http://localhost:8000
-
-CLIENT_ID=
-CLIENT_SECRET=
-        `.trim(), "utf8");
-    } catch (e) {
-        console.log("Could not create .env file");
-    }
-}
-
-dotenv.config();
+dotenv.config({
+    path: path.resolve(process.cwd(), "../.env")
+});
 
 import { MayaApiServer } from "../src";
 
