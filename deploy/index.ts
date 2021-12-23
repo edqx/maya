@@ -31,10 +31,10 @@ app.post("/", async (req, res) => {
         return;
     }
 
-    const hmac = crypto.createHmac("sha256", process.env.WEBHOOK_SECRET as string);
-    hmac.write(req.body);
+    const hmacVerifier = crypto.createHmac("sha256", process.env.WEBHOOK_SECRET as string);
+    hmacVerifier.write(req.body);
 
-    const sha256 = hmac.digest("hex");
+    const sha256 = hmacVerifier.digest("hex");
 
     if (sha256 !== req.header("X-Hub-Signature-256")) {
         console.log("Got deploy POST but the signature did not match:");
