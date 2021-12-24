@@ -10,12 +10,12 @@ module.exports = {
         },
         {
             name: "bot",
-            script: "dist/index.js",
+            script: "dist/bin/index.js",
             cwd: "bot"
         },
         {
             name: "deploy",
-            script: "dist/bin/index.js",
+            script: "dist/index.js",
             cwd: "deploy",
             env: {
                 PORT: 8002
