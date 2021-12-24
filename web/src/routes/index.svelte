@@ -100,6 +100,10 @@
         : undefined;
 </script>
 
+<svelte:head>
+    <title>Maya</title>
+</svelte:head>
+
 <div class="centre-wrapper">
     {#if loading}
         <Loader></Loader>
