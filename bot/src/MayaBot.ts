@@ -25,7 +25,6 @@ export interface MayaBotConfig {
         port: number;
         password: string|undefined;
     };
-    botToken: string;
 }
 
 export class MayaBot {
@@ -44,8 +43,6 @@ export class MayaBot {
             intents: [ discord.Intents.FLAGS.GUILDS ]
         });
         this.rest = new REST();
-        this.client.login(config.botToken);
-        this.rest.setToken(config.botToken || "");
 
         this.database = new MayaDatabaseConnection({
             host: "127.0.0.1",

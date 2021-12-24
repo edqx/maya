@@ -43,8 +43,7 @@ async function writeCommandsCached(hash: Buffer) {
             host: process.env.REDIS_HOST as string || "127.0.0.1",
             port: parseInt(process.env.REDIS_PORT || "6379"),
             password: process.env.REDIS_PASSWORD as string|undefined
-        },
-        botToken: process.env.BOT_TOKEN as string
+        }
     }, process.env.GUILD_ID as string|undefined);
 
     const files = await fs.readdir(path.resolve(__dirname, "./commands"));
@@ -65,41 +64,42 @@ async function writeCommandsCached(hash: Buffer) {
         }
     }
     
-    (async () => {
-        bot.client.once("ready", async () => {
-            if (!bot.client.isReady())
-                return;
+    bot.client.once("ready", async () => {
+        if (!bot.client.isReady())
+            return;
 
-            const addCommandMeta: CommandMeta[] = [];
+        const addCommandMeta: CommandMeta[] = [];
 
-            for (const [ , command ] of bot.registeredCommands) {
-                addCommandMeta.push(getCommandMeta(command)!);
+        for (const [ , command ] of bot.registeredCommands) {
+            addCommandMeta.push(getCommandMeta(command)!);
+        }
+
+        const getCached = await getCommandsCached()
+        const commandsHash = getCommandsHash(addCommandMeta);
+
+        if (!getCached || !crypto.timingSafeEqual(getCached, commandsHash)) {
+            await writeCommandsCached(commandsHash);
+            console.log("Uploading commands..");
+
+            if (bot.testingGuildId) {
+                await bot.rest.put(
+                    dtypes.Routes.applicationGuildCommands(bot.client.application.id, bot.testingGuildId),
+                    {
+                        body: addCommandMeta
+                    }
+                );
+            } else {
+                await bot.rest.put(
+                    dtypes.Routes.applicationCommands(bot.client.application.id),
+                    {
+                        body: addCommandMeta
+                    }
+                );
             }
-
-            const getCached = await getCommandsCached()
-            const commandsHash = getCommandsHash(addCommandMeta);
-
-            if (!getCached || !crypto.timingSafeEqual(getCached, commandsHash)) {
-                await writeCommandsCached(commandsHash);
-                console.log("Uploading commands..");
-
-                if (bot.testingGuildId) {
-                    await bot.rest.put(
-                        dtypes.Routes.applicationGuildCommands(bot.client.application.id, bot.testingGuildId),
-                        {
-                            body: addCommandMeta
-                        }
-                    );
-                } else {
-                    await bot.rest.put(
-                        dtypes.Routes.applicationCommands(bot.client.application.id),
-                        {
-                            body: addCommandMeta
-                        }
-                    );
-                }
-            }
-            console.log("Client ready!");
-        });
-    })();
+        }
+        console.log("Client ready!");
+    });
+    
+    bot.client.login(process.env.BOT_TOKEN as string);
+    bot.rest.setToken(process.env.BOT_TOKEN as string || "");
 })();
