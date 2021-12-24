@@ -85,9 +85,7 @@ app.post("/", async (req, res) => {
             console.log("Pulling remote changes..");
             await runCommandInDir("git pull");
             console.log("Installing new dependencies..");
-            try {
-                await runCommandInDir("yarn");
-            } catch (e) {}
+            await runCommandInDir("yarn");
     
             const failedToBuild: [ string, Error ][] = [];
             console.log(`Building ${workspacesToBuild.map(workspace => `@maya/${workspace}`).join(", ")} (${workspacesToBuild.length})..`);
@@ -109,7 +107,7 @@ app.post("/", async (req, res) => {
                     .setDescription(`Failed to build some workspaces:`);
 
                 for (const [ workspace, error ] of failedToBuild) {
-                    embed.addField(workspace, "```" + error.toString().substr(0, 1020) + "```");
+                    embed.addField("@maya/" + workspace, "```" + error.toString().substr(0, 1020) + "```");
                 }
             }
         } catch (e: any) {

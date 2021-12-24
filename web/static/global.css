@@ -13,6 +13,7 @@ html, body, #svelte {
 a {
     text-decoration: none;
     cursor: pointer;
+    color: #42a5f5;
 }
 
 button {
@@ -23,6 +24,7 @@ button {
     padding-right: 10px;
     border-radius: 4px;
     background-color: #222222;
+    color: #eeeeee;
     cursor: pointer;
     display: flex;
     align-items: center;

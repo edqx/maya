@@ -8,6 +8,8 @@ dotenv.config({
 import { MayaApiServer } from "../src";
 
 (async () => {
+    const port = parseInt(process.env.PORT || "8000");
+
     const accountServer = new MayaApiServer({
         postgres: {
             host: process.env.POSTGRES_HOST as string || "127.0.0.1",
@@ -22,11 +24,13 @@ import { MayaApiServer } from "../src";
             port: parseInt(process.env.REDIS_PORT || "6379"),
             password: process.env.REDIS_PASSWORD as string|undefined
         },
-        port: parseInt(process.env.PORT || "8000")
+        port
     });
     
     (async () => {
+        accountServer.httpServer.once("listening", () => {
+            console.log("Listening on port *:" + port);
+        });
         await accountServer.start();
-        console.log("Listening on port *:" + accountServer.config.port);
     })();
 })();

@@ -1,17 +1,18 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { page } from "$app/stores";
-    import { goto } from "$app/navigation";
-    import TailSpinLoader from "../components/tail-spin.svg"
-import Fail from "./fail.svelte";
+    import ButtonLoader from "../components/ButtonLoader.svg"
+    import Loader from "../components/Loader.svg"
 
+    let loading = true;
     let user: any = undefined;
-    let allConnections: Record<string, string> = [];
+    let allConnections: Record<string, string> = {};
 
-    $: profilePictureHref = user
-        ? user.avatar.startsWith("a_")
-            ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.gif`
-            : `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+    $: profilePictureHref = user 
+        ? user.avatar
+            ? user.avatar.startsWith("a_")
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.gif`
+                : `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+            : `https://cdn.discordapp.com/embed/avatars/${parseInt(user.discriminator) % 5}.png`
         : undefined;
 
     onMount(async () => {
@@ -36,6 +37,8 @@ import Fail from "./fail.svelte";
                 }
             }
         }
+        
+        loading = false;
     });
 
     let logoutLoading = false;
@@ -98,82 +101,86 @@ import Fail from "./fail.svelte";
 </script>
 
 <div class="centre-wrapper">
-    <div class="centre">
-        <span class="splash-title">Maya</span>
-        {#if user}
-            <span class="header">Logged in as</span>
-            <div class="user-details">
-                <div class="user-info">
-                    <img class="user-pfp" src={profilePictureHref} width=26 alt="avatar"/>
-                    <span class="user-tag">{user.username}<span class="user-discriminator">#{user.discriminator}</span></span>
-                </div>
-                <div class="user-actions">
-                    <button style="width: 60px;" on:click={() => logout()}>
-                        {#if logoutLoading}
-                            <TailSpinLoader width={16}></TailSpinLoader>
-                        {:else}
-                            Logout
-                        {/if}
-                    </button>
-                </div>
-            </div>
-            <div class="connections-list">
-                <span class="header">Manage connections</span>
-                {#if failedConnection}
-                    <span class="error">
-                        Failed to connect your account with {failedConnection.fancy}
-                        {#if failInformation.status}
-                            ({failInformation.status}, {failInformation.message})
-                        {/if}
-                    </span>
-                {/if}
-                {#each connections as connection}
-                    <div class="connection">
-                        <a class="connection-info" href="{allConnections[connection.id] ? connection.url() : ""}">
-                            <img class="connection-image" src="{connection.icon}" width=26 alt="{connection.fancy} icon">
-                            <span class="connection-name">{connection.fancy}</span>
-                        </a>
-                        <div class="connection-actions">
-                            {#if allConnections[connection.id]}
-                                <button style="width: 84px;" on:click={() => unlinkConnection(connection.id)}>
-                                    {#if connectionLoading.has(connection.id)}
-                                        <TailSpinLoader width={16}></TailSpinLoader>
-                                    {:else}
-                                        Disconnect
-                                    {/if}
-                                </button>
+    {#if loading}
+        <Loader></Loader>
+    {:else}
+        <div class="centre">
+            <span class="splash-title">Maya</span>
+            {#if user}
+                <span class="header">Logged in as</span>
+                <div class="user-details">
+                    <div class="user-info">
+                        <img class="user-pfp" src={profilePictureHref} width=26 alt="avatar"/>
+                        <span class="user-tag">{user.username}<span class="user-discriminator">#{user.discriminator}</span></span>
+                    </div>
+                    <div class="user-actions">
+                        <button style="width: 60px;" on:click={() => logout()}>
+                            {#if logoutLoading}
+                                <ButtonLoader width={16}></ButtonLoader>
                             {:else}
-                                <a rel="external" href="{import.meta.env.VITE_API_BASE_URL}/auth/{connection.id}">
-                                    <button style="width: 65px;">
+                                Logout
+                            {/if}
+                        </button>
+                    </div>
+                </div>
+                <div class="connections-list">
+                    <span class="header">Manage connections</span>
+                    {#if failedConnection}
+                        <span class="error">
+                            Failed to connect your account with {failedConnection.fancy}
+                            {#if failInformation.status}
+                                ({failInformation.status}, {failInformation.message})
+                            {/if}
+                        </span>
+                    {/if}
+                    {#each connections as connection}
+                        <div class="connection">
+                            <a class="connection-info" href="{allConnections[connection.id] ? connection.url() : ""}">
+                                <img class="connection-image" src="{connection.icon}" width=26 alt="{connection.fancy} icon">
+                                <span class="connection-name">{connection.fancy}</span>
+                            </a>
+                            <div class="connection-actions">
+                                {#if allConnections[connection.id]}
+                                    <button style="width: 84px;" on:click={() => unlinkConnection(connection.id)}>
                                         {#if connectionLoading.has(connection.id)}
-                                            <TailSpinLoader width={16}></TailSpinLoader>
+                                            <ButtonLoader width={16}></ButtonLoader>
                                         {:else}
-                                            Connect
+                                            Disconnect
                                         {/if}
                                     </button>
-                                </a>
-                            {/if}
+                                {:else}
+                                    <a rel="external" href="{import.meta.env.VITE_API_BASE_URL}/auth/{connection.id}">
+                                        <button style="width: 65px;">
+                                            {#if connectionLoading.has(connection.id)}
+                                                <ButtonLoader width={16}></ButtonLoader>
+                                            {:else}
+                                                Connect
+                                            {/if}
+                                        </button>
+                                    </a>
+                                {/if}
+                            </div>
                         </div>
-                    </div>
-                {/each}
-            </div>
-            <a class="delete-info" href="/account/delete">Delete my Information</a>
-        {:else}
-            <div class="login">
-                {#if failInformation && failInformation.connectionId === "discord"}
-                    <span style="margin-bottom: 8px;" class="error">
-                        Failed to connect your account with Discord
-                        {#if failInformation.status}
-                            ({failInformation.status}, {failInformation.message})
-                        {/if}
-                    </span>
-                {/if}
-                <a rel="external" href="{import.meta.env.VITE_API_BASE_URL}/auth/discord">
-                    <button>Login with <img class="discord" src="/discord.svg" alt="discord" height=32></button>
-                </a>
-            </div>
-        {/if}
-    </div>
+                    {/each}
+                </div>
+                <div><a class="delete-info" href="/account/delete">Delete my Information</a></div>
+            {:else}
+                <div class="login">
+                    {#if failInformation && failInformation.connectionId === "discord"}
+                        <span style="margin-bottom: 8px;" class="error">
+                            Failed to connect your account with Discord
+                            {#if failInformation.status}
+                                ({failInformation.status}, {failInformation.message})
+                            {/if}
+                        </span>
+                    {/if}
+                    <a rel="external" href="{import.meta.env.VITE_API_BASE_URL}/auth/discord">
+                        <button>Login with <img class="discord" src="/discord.svg" alt="discord" height=32></button>
+                    </a>
+                </div>
+            {/if}
+        </div>
+    {/if}
 </div>
 
 <style>

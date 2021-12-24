@@ -9,7 +9,7 @@ import { REST } from "@discordjs/rest";
 import { Cache } from "./util/Cache";
 
 import { RedisChannels } from "./types";
-import { Account, AccountConnection, SessionId } from "./structures";
+import { Account, AccountConnection, InteractionState, SessionId } from "./structures";
 
 export interface PostgresConfig {
     host: string;
@@ -63,7 +63,7 @@ export class MayaDatabaseConnection {
         );
 
         this.cache = new Cache(this.redisPubConnection);
-        this.randomBuffer = Buffer.alloc(20);
+        this.randomBuffer = Buffer.alloc(32);
 
         this.redisSubConnection.subscribe(RedisChannels.CacheInvalidation);
         this.redisSubConnection.on("message", async (channel: string, message: string) => {
@@ -81,7 +81,6 @@ export class MayaDatabaseConnection {
                 }
 
                 const sha256Hash = crypto.createHash("sha256").update(buf);
-
                 resolve(sha256Hash.digest("hex"));
             });
         });
@@ -129,16 +128,16 @@ export class MayaDatabaseConnection {
         return sessionRow as SessionId;
     }
 
-    async getSessionByIp(user: string|Account, ipAddress: string): Promise<SessionId|undefined> {
+    async getSessionByIpAndAgent(user: string|Account, ipAddress: string, userAgent: string): Promise<SessionId|undefined> {
         const userId = typeof user === "string" ? user : user.user_id;
-        const cachedSession = this.cache.getCached<SessionId>(`session.${userId}.${ipAddress}`);
+        const cachedSession = this.cache.getCached<SessionId>(`session.${userId}.${ipAddress}.${userAgent}`);
         if (cachedSession)
             return cachedSession === null ? undefined : cachedSession;
 
         const sessionRows = await this.postgresConnection`
             SELECT *
             FROM session_ids
-            WHERE discord_user_id = ${userId} AND ip_address = ${ipAddress}
+            WHERE discord_user_id = ${userId} AND ip_address = ${ipAddress} AND user_agent=${userAgent}
         `;
 
         const sessionRow = sessionRows[0];
@@ -152,9 +151,9 @@ export class MayaDatabaseConnection {
         return sessionRow as SessionId;
     }
 
-    async getOrCreateSession(user: string|Account, ipAddress: string): Promise<SessionId> {
+    async getOrCreateSession(user: string|Account, ipAddress: string, userAgent: string): Promise<SessionId> {
         const userId = typeof user === "string" ? user : user.user_id;
-        const existingSession = await this.getSessionByIp(userId, ipAddress);
+        const existingSession = await this.getSessionByIpAndAgent(userId, ipAddress, userAgent);
 
         if (existingSession)
             return existingSession;
@@ -162,8 +161,8 @@ export class MayaDatabaseConnection {
         const newSessionId = await this.generateRandomHash();
 
         await this.postgresConnection`
-            INSERT INTO session_ids(discord_user_id, id, ip_address)
-            VALUES (${userId}, ${newSessionId}, ${ipAddress})
+            INSERT INTO session_ids(discord_user_id, id, ip_address, user_agent)
+            VALUES (${userId}, ${newSessionId}, ${ipAddress}, ${userAgent})
         `;
 
         return {
@@ -372,11 +371,71 @@ export class MayaDatabaseConnection {
         return accountConnection.access_token;
     }
 
+    async getInteractionState(executionId: string) {
+        const cachedState = this.cache.getCached<InteractionState>(`interaction.${executionId}`);
+        if (cachedState) {
+            return cachedState === null ? undefined : cachedState;
+        }
+
+        const interactionStateRows = await this.postgresConnection`
+            SELECT *
+            FROM interaction_states
+            WHERE execution_id = ${executionId}
+        `;
+
+        const interactionState = interactionStateRows[0];
+
+        if (!interactionState) {
+            await this.cache.setCached(`interaction.${executionId}`, null, 5);
+            return undefined;
+        }
+
+        await this.cache.setCached(`interaction.${executionId}`, interactionState, 10);
+        return interactionState as InteractionState;
+    }
+
+    async createInteractionState(executionId: string, userId: string, guildId: string, commandName: string, commandVersion: string, state: any) {
+        const strState = JSON.stringify(state);
+
+        await this.postgresConnection`
+            INSERT INTO interaction_states(user_id, guild_id, interaction_state, execution_id, command_name, command_version)
+            VALUES (${userId}, ${guildId}, ${strState}, ${executionId}, ${commandName}, ${commandVersion})
+            ON CONFLICT ON CONSTRAINT interaction_states_pk
+            DO UPDATE
+                SET interaction_state = ${strState}
+        `;
+        
+        await this.cache.invalidateCached(`interaction.${executionId}`);
+    }
+
+    async setInteractionState(executionId: string, state: any) {
+        const strState = JSON.stringify(state);
+
+        const updatedRows = await this.postgresConnection`
+            UPDATE interaction_states
+            SET interaction_state = ${strState}
+            WHERE execution_id = ${executionId}
+            RETURNING *
+        `;
+
+        const updatedRow = updatedRows[0] as InteractionState;
+
+        if (!updatedRow)
+            return;
+        
+        await this.cache.invalidateCached(`interaction.${executionId}`);
+        await this.cache.setCached(`interaction.${executionId}`, updatedRow, 10);
+    }
+
     async deleteAllInformation(user: string|Account) {
         const userId = typeof user === "string" ? user : user.user_id;
-
-        const connections = await this.getAccountConnections(user);
-        const sessions = await this.getSessions(user);
+        
+        const interactions = await this.postgresConnection`
+            DELETE
+            FROM interaction_states
+            WHERE user_id = ${userId}
+            RETURNING *
+        ` as InteractionState[];
 
         await this.postgresConnection`
             DELETE
@@ -384,21 +443,27 @@ export class MayaDatabaseConnection {
             WHERE user_id = ${userId}
         `;
         
-        await this.postgresConnection`
+        const connections = await this.postgresConnection`
             DELETE
             FROM account_connections
             WHERE discord_user_id = ${userId}
-        `;
+            RETURNING *
+        ` as AccountConnection[];
         
-        await this.postgresConnection`
+        const sessions = await this.postgresConnection`
             DELETE
             FROM session_ids
             WHERE discord_user_id = ${userId}
-        `;
+            RETURNING *
+        ` as SessionId[];
 
         await this.cache.invalidateCached(`connections.${userId}`);
         await this.cache.invalidateCached(`account.${userId}`);
         await this.cache.invalidateCached(`sessions.${userId}`);
+
+        for (const interaction of interactions) {
+            await this.cache.invalidateCached(`interaction.${interaction.execution_id}`);
+        }
 
         for (const connection of connections) {
             await this.cache.invalidateCached(`connection.${userId}.${connection.connection_name}`);

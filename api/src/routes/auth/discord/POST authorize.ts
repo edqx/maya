@@ -36,7 +36,7 @@ export default async function (server: MayaApiServer, req: express.Request, res:
 
                 await server.database.createAccount(userJson.id, tokenExchangeJson.access_token, tokenExchangeJson.refresh_token, tokenExchangeJson.token_type, expiresAt, tokenExchangeJson.scope);
 
-                const sessionData = await server.database.getOrCreateSession(userJson.id, ipAddress || "");
+                const sessionData = await server.database.getOrCreateSession(userJson.id, ipAddress || "", req.header("User-Agent") || "");
 
                 return res.cookie("session-id", sessionData.id).status(200).json({
                     success: true,

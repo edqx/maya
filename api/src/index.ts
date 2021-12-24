@@ -153,26 +153,17 @@ export interface AccountServerConfig {
 
 export class MayaApiServer {
     expressServer: express.Express;
-    httpServer?: http.Server;
+    httpServer: http.Server;
     discordApi: dapi.REST;
 
     database: MayaDatabaseConnection;
 
-    constructor(public readonly config: AccountServerConfig) {
+    constructor(config: AccountServerConfig) {
         this.expressServer = express();
 
         this.database = new MayaDatabaseConnection(config.postgres, config.redis);
-
+        this.httpServer = this.expressServer.listen(config.port, "0.0.0.0");
         this.discordApi = new dapi.REST().setToken(process.env.BOT_TOKEN as string);
-    }
-    
-    private listen() {
-        return new Promise<void>(resolve => {
-            this.httpServer = this.expressServer.listen(this.config.port, "0.0.0.0");
-            this.httpServer.once("listening", () => {
-                resolve();
-            });
-        });
     }
 
     async start() {
@@ -222,6 +213,5 @@ export class MayaApiServer {
                 }
             });
         }
-        await this.listen();
     }
 }
